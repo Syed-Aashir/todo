@@ -11,19 +11,21 @@ import {
 
 function Home() {
   const navigate = useNavigate();
+  const allContacts = JSON.parse(localStorage.getItem('contactsList')); //readOnly
 
   const [contacts, setContacts] = useState([]);
   const [search, setSearch] = useState('');
-  function getData(e) {
+  const [order, setOrder] = useState('');
+  const [filter, setFilter] = useState('');
+
+  function handleSetSearch(e) {
     setSearch(e.target.value);
   }
 
-  const [order, setOrder] = useState('');
   function getOrderData(e) {
     setOrder(e.target.value);
   }
 
-  const [filter, setFilter] = useState('');
   function getFilterData(e) {
     setFilter(e.target.value);
   }
@@ -34,6 +36,25 @@ function Home() {
     console.log(filter);
     navigate('/newContact');
   }
+
+  function searchContacts(search) {
+    const searchVal = search.toLowerCase();
+    if (searchVal) {
+      const searchContacts = contacts.filter((contact) => {
+        const firstName = contact.firstName.toLowerCase();
+        const lastName = contact.lastName.toLowerCase();
+        return firstName.includes(searchVal) || lastName.includes(searchVal);
+      });
+      setContacts([...searchContacts]);
+    } else {
+      setContacts([...allContacts]);
+    }
+  }
+
+  useEffect(() => {
+    // when search state updated - (Component Update & Re-render)
+    searchContacts(search);
+  }, [search]);
 
   useEffect(() => {
     // mounting -> dependency array is empty
@@ -57,7 +78,7 @@ function Home() {
               name='searchContact'
               id='search-contact'
               placeholder='Search by name'
-              onChange={getData}
+              onChange={handleSetSearch}
             />
             <div class='filter-container'>
               <div class='order-wrapper'>
@@ -93,7 +114,10 @@ function Home() {
 
           <div id='contacts-list'>
             {contacts?.map((contact) => (
-              <div> {contact.firstName}</div>
+              <div>
+                {' '}
+                {contact.firstName} - {contact.lastName}
+              </div>
             ))}
           </div>
 
