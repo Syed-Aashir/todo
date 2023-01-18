@@ -27,6 +27,7 @@ function Home() {
   }
 
   function getFilterData(e) {
+    console.log('filter ->', e.target.value);
     setFilter(e.target.value);
   }
 
@@ -47,14 +48,26 @@ function Home() {
       });
       setContacts([...searchContacts]);
     } else {
-      setContacts([...allContacts]);
+      allContacts?.length && setContacts([...allContacts]);
     }
   }
 
-  useEffect(() => {
-    // when search state updated - (Component Update & Re-render)
-    searchContacts(search);
-  }, [search]);
+  function filterContacts(attribute) {
+    if (attribute) {
+      const filterContacts = contacts.filter((contact) => {
+        // {firstName,lastName,phoneNumber,email} = contact
+        // console.log(contact['email']);
+        return (
+          contact[attribute] !== null &&
+          contact[attribute] !== '' &&
+          contact[attribute] !== undefined
+        );
+      });
+      setContacts([...filterContacts]);
+    } else {
+      allContacts?.length && setContacts([...allContacts]);
+    }
+  }
 
   useEffect(() => {
     // mounting -> dependency array is empty
@@ -63,6 +76,16 @@ function Home() {
       setContacts([...contacts]);
     }
   }, []);
+
+  useEffect(() => {
+    console.log('filter effect');
+    filterContacts(filter);
+  }, [filter]);
+
+  useEffect(() => {
+    // when search state updated - (Component Update & Re-render)
+    searchContacts(search);
+  }, [search]);
 
   return (
     <div>
@@ -101,21 +124,20 @@ function Home() {
                 <label>
                   <strong>Filter by:</strong>
                 </label>
-                <select id='filter-select' onClick={getFilterData}>
+                <select id='filter-select' onChange={getFilterData}>
                   <option value=''>All Contacts</option>
                   <option value='phoneNumber'>
                     Contacts with phone Numbers
                   </option>
-                  <option value='emailAddress'>Contacts having Email Id</option>
+                  <option value='email'>Contacts having Email Id</option>
                 </select>
               </div>
             </div>
           </div>
 
           <div id='contacts-list'>
-            {contacts?.map((contact) => (
-              <div>
-                {' '}
+            {contacts?.map((contact, index) => (
+              <div key={`contact-${index}`}>
                 {contact.firstName} - {contact.lastName}
               </div>
             ))}
