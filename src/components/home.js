@@ -27,7 +27,6 @@ function Home() {
   }
 
   function getFilterData(e) {
-    console.log('filter ->', e.target.value);
     setFilter(e.target.value);
   }
 
@@ -54,7 +53,7 @@ function Home() {
 
   function filterContacts(attribute) {
     if (attribute) {
-      const filterContacts = contacts.filter((contact) => {
+      const filterContacts = allContacts.filter((contact) => {
         // {firstName,lastName,phoneNumber,email} = contact
         // console.log(contact['email']);
         return (
@@ -69,6 +68,25 @@ function Home() {
     }
   }
 
+  function orderContacts(order) {
+    if (order) {
+      const orderData = contacts.sort((a, b) => {
+        const val1 = a.firstName.toLowerCase();
+        const val2 = b.firstName.toLowerCase();
+        if (val1 < val2) {
+          return order * -1;
+        } else if (val1 > val2) {
+          return order * 1;
+        } else {
+          return 0;
+        }
+      });
+      setContacts([...orderData]);
+    } else {
+      allContacts?.length && setContacts([...allContacts]);
+    }
+  }
+
   useEffect(() => {
     // mounting -> dependency array is empty
     const contacts = JSON.parse(localStorage.getItem('contactsList'));
@@ -78,9 +96,12 @@ function Home() {
   }, []);
 
   useEffect(() => {
-    console.log('filter effect');
     filterContacts(filter);
   }, [filter]);
+
+  useEffect(() => {
+    orderContacts(order);
+  }, [order]);
 
   useEffect(() => {
     // when search state updated - (Component Update & Re-render)
@@ -110,7 +131,7 @@ function Home() {
                 </label>
                 <select
                   id='order-select'
-                  onClick={getOrderData}
+                  onChange={getOrderData}
                   defaultValue={''}
                 >
                   <option value='' disabled hidden>
