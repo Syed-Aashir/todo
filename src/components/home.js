@@ -31,9 +31,6 @@ function Home() {
   }
 
   function logValues() {
-    console.log(search);
-    console.log(order);
-    console.log(filter);
     navigate('/newContact');
   }
 
